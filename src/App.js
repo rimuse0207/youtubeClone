@@ -1,26 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import SearchBar from "./SearchBar";
+import YTSearch from "youtube-api-search";
+import VideoList from "./VideoList";
+import VideoDetail from "./VideoDetail";
+import "./style.css";
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      videos: [],
+      select: ""
+    };
+    this.SerachTerm("surfboards");
+  }
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  SerachTerm = term => {
+    YTSearch({ key: process.env.REACT_APP_YOUTUBE_KEY, term: term }, videos => {
+      console.log(term);
+      this.setState({ videos, select: videos[0] });
+    });
+  };
+
+  render() {
+    return (
+      <div className="App">
+        <SearchBar onSearchTerm={term => this.SerachTerm(term)}></SearchBar>
+
+        <VideoDetail video={this.state.select}></VideoDetail>
+        <VideoList
+          onVideoSelect={select => this.setState({ select })}
+          videos={this.state.videos}
+        ></VideoList>
+      </div>
+    );
+  }
 }
-
-export default App;
